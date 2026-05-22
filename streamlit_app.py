@@ -16,9 +16,9 @@ if st.button("🔄 อัปเดตข้อมูลล่าสุด", use_
 
 st.divider()
 
-# ฟังก์ชันดึงข้อมูลตารางเวร (ใช้ ID ชีตเดิมของน้า)
+# ฟังก์ชันดึงข้อมูลตารางเวร (ใช้ ID ชีตใหม่ที่น้าส่งมาเรียบร้อยครับ)
 def get_shift_data():
-    spreadsheet_id = "10LJJzAoMcWfWnkcZrlEEyhogIEfmnoGzx7QsgG_2yg4"
+    spreadsheet_id = "1hVGvgnJ97xK3v6_wnwU01KS_XCTXg3jaC8aqxYZwcCQ"
     csv_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/gviz/tq?tqx=out:csv&sheet=Sheet1&t={int(time.time())}"
     
     df_raw = pd.read_csv(csv_url)
@@ -28,13 +28,13 @@ def get_shift_data():
 try:
     df = get_shift_data()
 except Exception as e:
-    st.error("❌ ไม่สามารถดึงข้อมูลได้: กรุณาตรวจสอบการแชร์ลิงก์ของ Google Sheets")
+    st.error("❌ ไม่สามารถดึงข้อมูลได้: กรุณาตรวจสอบการตั้งค่าแชร์ลิงก์ของ Google Sheets (ให้เป็น 'ทุกคนที่มีลิงก์')")
     st.stop()
 
 if df.empty:
     st.warning("⚠️ ไม่พบข้อมูลในกูเกิลชีต กรุณากรอกข้อมูลตารางเวรก่อนครับ")
 else:
-    # 📌 รายชื่อพนักงานทั้ง 10 ท่าน
+    # 📌 รายชื่อพนักงานทั้ง 10 ท่านตามที่กำหนด
     staff_list = [
         "สุทธิโชค", "ศักดิ์ชาย", "ภิญโญ", "อภิวัฒน์", "อนุชิต", 
         "ศักรินทร์", "รุ่งโรจน์", "เวทิม", "คมสัน", "วรวัฒน์"
@@ -57,7 +57,7 @@ else:
         # นับกะ 3 (คอลัมน์ กะ3_คนที1 และ กะ3_คนที2)
         shift3 = 0
         if "กะ3_คนที1" in df.columns: shift3 += df["กะ3_คนที1"].astype(str).str.strip().eq(staff).sum()
-        if "กะ3_คนที2" in df.columns: shift3 += df["กะ3_คนที2"].astype(str).str.strip().eq(staff).sum()
+        if "กะ3_คนที2" in df.columns: shift3 += df["กะ3_คนที2"].astype(str).str.strip().sum() if "กะ3_คนที2" in df.columns and type(df["กะ3_คนที2"])==bool else df["กะ3_คนที2"].astype(str).str.strip().eq(staff).sum()
         
         total = shift1 + shift2 + shift3
         
@@ -93,7 +93,6 @@ else:
     st.subheader("📅 ตารางเวรแก้กระแสไฟฟ้าขัดข้อง ประจำเดือน")
     
     try:
-        # กำหนดชื่อหัวตารางแบบควบแถว (Multi-index) ให้ตรงกับจำนวนคอลัมน์จริงใน Google Sheets ของน้า
         header_tuples = [
             ("วัน/กะ", "วัน/กะ"),
             ("ช่วง 1 (00:30 - 08:30)", "คนที่ 1"),
